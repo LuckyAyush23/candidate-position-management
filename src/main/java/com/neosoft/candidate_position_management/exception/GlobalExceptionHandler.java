@@ -3,6 +3,7 @@ package com.neosoft.candidate_position_management.exception;
 import com.neosoft.candidate_position_management.dto.common.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,5 +42,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(ApiResponse.failure(errorMessage));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidFormat(HttpMessageNotReadableException ex) {
+        String message = "Invalid date format. Please use yyyy-MM-dd";
+        return ResponseEntity.badRequest().body(ApiResponse.failure(message));
     }
 }

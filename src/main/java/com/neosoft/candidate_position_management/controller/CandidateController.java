@@ -21,9 +21,9 @@ public class CandidateController {
     private final CandidateService candidateService;
 
     @PostMapping
-    public ResponseEntity<CandidateResponseDTO> createCandidate(@Valid @RequestBody CandidateDTO dto){
+    public ResponseEntity<ApiResponse<CandidateResponseDTO>> createCandidate(@Valid @RequestBody CandidateDTO dto){
         CandidateResponseDTO response = candidateService.createCandidate(dto);
-        return ResponseEntity.status(201).body(response);
+        return ResponseEntity.status(201).body(ApiResponse.success("Candidate created successfully",response));
     }
 
     @PatchMapping("/{id}")
