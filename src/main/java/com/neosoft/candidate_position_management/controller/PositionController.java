@@ -27,32 +27,36 @@ public class PositionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PositionResponseDTO>> getAllPositions() {
-        return ResponseEntity.ok(positionService.getAllPositions());
+    public ResponseEntity<ApiResponse<List<PositionResponseDTO>>> getAllPositions() {
+        List<PositionResponseDTO> positions = positionService.getAllPositions();
+        return ResponseEntity.ok(ApiResponse.success("Positions fetched successfully", positions));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PositionResponseDTO> getPositionById(@PathVariable Long id) {
-        return ResponseEntity.ok(positionService.getPositionById(id));
+    public ResponseEntity<ApiResponse<PositionResponseDTO>> getPositionById(@PathVariable Long id) {
+        PositionResponseDTO position = positionService.getPositionById(id);
+        return ResponseEntity.ok(ApiResponse.success("Position fetched successfully", position));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PositionResponseDTO> updatePosition(
+    public ResponseEntity<ApiResponse<PositionResponseDTO>> updatePosition(
             @PathVariable Long id,
             @Valid @RequestBody PositionDTO dto) {
-        return ResponseEntity.ok(positionService.updatePosition(id, dto));
+        PositionResponseDTO updated = positionService.updatePosition(id, dto);
+        return ResponseEntity.ok(ApiResponse.success("Position updated successfully", updated));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<PositionResponseDTO> patchPosition(
+    public ResponseEntity<ApiResponse<PositionResponseDTO>> patchPosition(
             @PathVariable Long id,
             @RequestBody PositionDTO dto) {
-        return ResponseEntity.ok(positionService.patchPosition(id, dto));
+        PositionResponseDTO patched = positionService.patchPosition(id, dto);
+        return ResponseEntity.ok(ApiResponse.success("Position patched successfully", patched));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePosition(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> deletePosition(@PathVariable Long id) {
         positionService.deletePosition(id);
-        return ResponseEntity.ok("Position deleted successfully");
+        return ResponseEntity.ok(ApiResponse.success("Position deleted successfully", null));
     }
 }

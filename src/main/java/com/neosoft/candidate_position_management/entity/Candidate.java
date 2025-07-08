@@ -1,7 +1,6 @@
 package com.neosoft.candidate_position_management.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +25,5 @@ public class Candidate {
     @JoinTable(name = "candidate_positions",
             joinColumns = @JoinColumn(name = "candidate_id"),
             inverseJoinColumns = @JoinColumn(name = "position_id"))
-    @JsonIgnore
     private List<Position> positions;
 }

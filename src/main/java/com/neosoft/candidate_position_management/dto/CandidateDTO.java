@@ -1,6 +1,7 @@
 package com.neosoft.candidate_position_management.dto;
 
 
+import com.neosoft.candidate_position_management.validation.MinAge;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CandidateDTO {
     @NotBlank
     @Size(max = 50)
@@ -25,8 +25,9 @@ public class CandidateDTO {
 
     @NotNull
     @Past
+    @MinAge(value = 18, message = "Candidate must be at least 18 years old")
     private LocalDate dob;
 
-    @NotEmpty
+    @NotEmpty(message = "Position list cannot be empty")
     private List<Long> positionIds;
 }

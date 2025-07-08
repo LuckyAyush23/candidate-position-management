@@ -7,7 +7,6 @@ import com.neosoft.candidate_position_management.dto.common.ApiResponse;
 import com.neosoft.candidate_position_management.service.CandidateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +16,6 @@ import java.util.List;
 @RequestMapping("/api/candidates")
 @RequiredArgsConstructor
 public class CandidateController {
-
     private final CandidateService candidateService;
 
     @PostMapping
@@ -26,27 +24,40 @@ public class CandidateController {
         return ResponseEntity.status(201).body(ApiResponse.success("Candidate created successfully",response));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<CandidateResponseDTO>> updateCandidate(
+            @PathVariable Long id,
+            @Valid @RequestBody CandidateDTO dto) {
+
+        CandidateResponseDTO updatedCandidate = candidateService.updateCandidate(id, dto);
+
+        return ResponseEntity.ok(ApiResponse.success("Candidate updated successfully", updatedCandidate));
+    }
+
+
     @PatchMapping("/{id}")
-    public ResponseEntity<CandidateResponseDTO> patchCandidate(
+    public ResponseEntity<ApiResponse<CandidateResponseDTO>> patchCandidate(
             @PathVariable Long id,
             @Valid @RequestBody CandidatePatchDTO dto) {
-        return ResponseEntity.ok(candidateService.patchCandidate(id, dto));
+        CandidateResponseDTO response = candidateService.patchCandidate(id, dto);
+        return ResponseEntity.ok(ApiResponse.success("Candidate updated successfully", response));
     }
 
     @GetMapping
-    public ResponseEntity<List<CandidateResponseDTO>> getAllCandidates() {
-        return ResponseEntity.ok(candidateService.getAllCandidates());
+    public ResponseEntity<ApiResponse<List<CandidateResponseDTO>>> getAllCandidates() {
+        List<CandidateResponseDTO> candidates = candidateService.getAllCandidates();
+        return ResponseEntity.ok(ApiResponse.success("Candidates fetched successfully", candidates));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CandidateResponseDTO> getCandidateById(@PathVariable Long id) {
-        return ResponseEntity.ok(candidateService.getCandidateById(id));
+    public ResponseEntity<ApiResponse<CandidateResponseDTO>> getCandidateById(@PathVariable Long id) {
+        CandidateResponseDTO candidate = candidateService.getCandidateById(id);
+        return ResponseEntity.ok(ApiResponse.success("Candidate fetched successfully", candidate));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteCandidateById(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<String>> deleteCandidateById(@PathVariable Long id) {
         candidateService.deleteCandidateById(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success("Candidate delete sucessfully" , null));
+        return ResponseEntity.ok(ApiResponse.success("Candidate deleted successfully", null));
     }
 }

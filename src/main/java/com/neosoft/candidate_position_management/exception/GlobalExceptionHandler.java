@@ -11,17 +11,17 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Map<String, Object>> handleCustomException(CustomException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("error", ex.getMessage());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
+    public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException ex) {
+        return new ResponseEntity<>(ApiResponse.failure(ex.getMessage()),HttpStatus.BAD_REQUEST);
+    }
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(ApiResponse.failure(ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
@@ -49,4 +49,5 @@ public class GlobalExceptionHandler {
         String message = "Invalid date format. Please use yyyy-MM-dd";
         return ResponseEntity.badRequest().body(ApiResponse.failure(message));
     }
+
 }

@@ -6,6 +6,7 @@ import com.neosoft.candidate_position_management.dto.CandidateResponseDTO;
 import com.neosoft.candidate_position_management.entity.Candidate;
 import com.neosoft.candidate_position_management.entity.Position;
 import com.neosoft.candidate_position_management.exception.CustomException;
+import com.neosoft.candidate_position_management.exception.ResourceNotFoundException;
 import com.neosoft.candidate_position_management.repository.CandidateRepository;
 import com.neosoft.candidate_position_management.repository.PositionRepository;
 import com.neosoft.candidate_position_management.service.CandidateService;
@@ -20,32 +21,47 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CandidateServiceImpl implements CandidateService {
 
-    private final CandidateRepository candidateRepo;
+    private final CandidateRepository candidateRepository;
     private final PositionRepository positionRepo;
     private final ModelMapper modelMapper;
 
     @Override
     public CandidateResponseDTO createCandidate(CandidateDTO dto) {
-        if (candidateRepo.existsByEmail(dto.getEmail())) {
+        if (candidateRepository.existsByEmail(dto.getEmail())) {
             throw new CustomException("Email already exists");
         }
 
         Candidate candidate = modelMapper.map(dto, Candidate.class);
         candidate.setPositions(positionRepo.findAllById(dto.getPositionIds()));
 
-        Candidate saved = candidateRepo.save(candidate);
+        Candidate saved = candidateRepository.save(candidate);
         return mapToDto(saved);
     }
 
     @Override
+    public CandidateResponseDTO updateCandidate(Long id, CandidateDTO dto) {
+        Candidate candidate = candidateRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with ID: " + id));
+
+        candidate.setName(dto.getName());
+        candidate.setEmail(dto.getEmail());
+        candidate.setDob(dto.getDob());
+        candidate.setPositions(positionRepo.findAllById(dto.getPositionIds()));
+
+        Candidate updated = candidateRepository.save(candidate);
+        return modelMapper.map(updated, CandidateResponseDTO.class);
+    }
+
+    @Override
     public CandidateResponseDTO patchCandidate(Long id, CandidatePatchDTO dto) {
-        Candidate candidate = candidateRepo.findById(id)
-                .orElseThrow(() -> new CustomException("Candidate not found"));
+        Candidate candidate = candidateRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with ID: " + id));
+
 
         if (dto.getName() != null) candidate.setName(dto.getName());
 
         if (dto.getEmail() != null && !dto.getEmail().equals(candidate.getEmail())) {
-            if (candidateRepo.existsByEmail(dto.getEmail())) {
+            if (candidateRepository.existsByEmail(dto.getEmail())) {
                 throw new CustomException("Email already exists");
             }
             candidate.setEmail(dto.getEmail());
@@ -59,30 +75,30 @@ public class CandidateServiceImpl implements CandidateService {
             candidate.setPositions(positionRepo.findAllById(dto.getPositionIds()));
         }
 
-        return mapToDto(candidateRepo.save(candidate));
+        return mapToDto(candidateRepository.save(candidate));
     }
+
     @Override
     public List<CandidateResponseDTO> getAllCandidates() {
-        return candidateRepo.findAll().stream()
+        return candidateRepository.findAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CandidateResponseDTO getCandidateById(Long id) {
-        Candidate candidate = candidateRepo.findById(id)
+        Candidate candidate = candidateRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Candidate not found with id: " + id));
         return mapToDto(candidate);
     }
 
     @Override
     public void deleteCandidateById(Long id) {
-        if (!candidateRepo.existsById(id)) {
+        if (!candidateRepository.existsById(id)) {
             throw new CustomException("Id is invalid");
         }
-        candidateRepo.deleteById(id);
+        candidateRepository.deleteById(id);
     }
-
 
     private CandidateResponseDTO mapToDto(Candidate candidate) {
         CandidateResponseDTO dto = modelMapper.map(candidate, CandidateResponseDTO.class);

@@ -17,7 +17,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Position {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 50, unique = true)

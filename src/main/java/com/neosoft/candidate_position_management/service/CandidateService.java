@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CandidateService {
     CandidateResponseDTO createCandidate(CandidateDTO dto);
-
+    CandidateResponseDTO updateCandidate(Long id, CandidateDTO dto);
     CandidateResponseDTO patchCandidate(Long id, CandidatePatchDTO dto);
     List<CandidateResponseDTO> getAllCandidates();
     CandidateResponseDTO getCandidateById(Long id);
